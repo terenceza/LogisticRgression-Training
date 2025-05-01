@@ -1,5 +1,10 @@
-#ifndef AUTOENCODER_HPP
-#define AUTOENCODER_HPP
+/******************************************************************************
+* Sensecoding.com Integrated Solutions for Low-Powered Systems
+* Run on Vitis HLS
+******************************************************************************/
+
+#ifndef LOG_REGRESSION_TRAIN
+#define LOG_REGRESSION_TRAIN
 
 #include <ap_fixed.h>
 
@@ -10,35 +15,35 @@
 #endif
 
 #define MAX_DATA_SIZE 4
-#define MAX_HIDDEN_SIZE 10
-#define MAX_FULL_DIM (MAX_DATA_SIZE * MAX_HIDDEN_SIZE)
-#define MAX_WEIGHTS_SIZE (MAX_DATA_SIZE * MAX_HIDDEN_SIZE)
 #define MAX_EPOCHS 1000
 #define MAX_SAMPLES 150
 
-//#ifdef __SYNTHESIS__
-//	typedef ap_fixed<1, 16, AP_RND_ZERO> DataType, CoeffType;
-//#else
+#ifdef __SYNTHESIS__
+	typedef ap_fixed<25, 5, AP_RND_ZERO> DataType;
+#else
 	typedef float DataType;
-	typedef double CoeffType;
-//#endif
+#endif
 
-void LogRegression(DataType* DataInP, DataType* LabelsInP,
-				   DataType* WeightsP, DataType* BiasP,
+void LogRegression(int* DataInBuff, int* LabelsInBuff,
+				   int* WeightsInBuff, int* WeightsOutBuff, int* BiasP,
 				   unsigned int* DataDimensionP, unsigned int* NumSamplesP,
-				   DataType* dw, DataType* db, DataType* cost
-				 );
+				   int* LearningRate, unsigned int* NumEpochs,
+				   int* CostP );
 
 void Propagate( DataType* Inputs, DataType* Labels,
-				DataType *w, DataType b,
+				DataType *w, DataType* b,
 				unsigned int num_px, unsigned int num_samples,
 				DataType* dw, DataType* db, DataType* cost);
 
+void CopyFloatToDataTypeBuffers(float* From, DataType* To, unsigned int Dim);
+void CopyDataTypeToFloatBuffers(DataType* From, float* To, unsigned int Dim);
+
+void CopyIntToDataTypeBuffers(int* From, DataType* To, unsigned int Dim);
+void CopyDataTypeToIntBuffers(DataType* From, int* To, unsigned int Dim);
+
 DataType sigmoid(DataType d);
-DataType sigmoidDerivation(DataType d);
 DataType squareError(DataType d1, DataType d2) ;
-//DataType Relu(DataType d);
-//DataType ReluDerivation(DataType d);
+DataType Relu(DataType d);
 
 //void backpropagate();
 
