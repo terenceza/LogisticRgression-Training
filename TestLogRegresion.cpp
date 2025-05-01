@@ -13,130 +13,12 @@
 
 using namespace std;
 
-#define RAND_MAX 0x7fff
-
-void FullPrint(	DataType* InputValues, DataType* HiddenValues,
-				unsigned int DataDimension, unsigned int HiddenDimension,
-				DataType* Weights,
-				DataType* WeightsChanges,
-				DataType* PrevWeightsChanges)
-
-{
-	cout.precision(10);
-	cout << fixed;
-
-	cout << "Encoder:" << endl;
-	cout << "Inputs Values: " << endl;
-
-	for (int i = 0; i < DataDimension; i++)
-	{
-		printf(" InputValues[%d] = %f \n", i, InputValues[i]);
-	}
-	cout << endl;
-	cout << "Encoder Weights: " << endl;
-
-	for (auto d = 0; d < DataDimension; d++)
-	{
-		for (auto h = 0; h < HiddenDimension; h++)
-		{
-			cout <<	Weights[d*HiddenDimension + h] << ", "
-				 << WeightsChanges[d*HiddenDimension + h] << ", "
-				 << PrevWeightsChanges[d*HiddenDimension + h] << endl;
-		}
-	}
-	cout << "Hidden Values: " << endl;
-	for (auto i = 0; i < HiddenDimension; i++)
-	{
-		printf(" HiddenValues[%d] = %f \n", i, HiddenValues[i]);
-	}
-
-	cout << endl;
-
-}
-
-
-vector<DataType *> ReadData(string path)
-{
-	std::vector<DataType *>data;
-	ifstream file(path, ios::in);
-	if (!file.is_open())
-	{
-		cerr << "Iris data file could not be read" << endl;
-		return data;
-	}
-
-	string str;
-	while (std::getline(file, str))
-	{
-		std::stringstream ss(str);
-		vector<string> tokens;
-		DataType *d = new DataType[5];
-		DataType *dptr = d;
-		DataType value;
-		for (string s; ss >> value;)
-		{
-			if (ss.peek() == ',')
-			{
-				ss.ignore();
-			}
-			*dptr++ = value;
-		}
-		data.push_back(d);
-	}
-
-	// lets normalize data for the sigmoid function need all values in the range ]0, 1[.
-
-	DataType max = std::numeric_limits<DataType>::max();
-	DataType min = std::numeric_limits<DataType>::min();
-	DataType mins[5] = { max, max, max, max, max};
-	DataType maxes[5] = { min, min, min, min, max};
-
-	for (auto row : data)
-	{
-		for (size_t i = 0; i < 5; i++)
-		{
-			if (row[i] > maxes[i])
-			{
-				maxes[i] = row[i];
-			}
-
-			if (row[i] < mins[i])
-			{
-				mins[i] = row[i];
-			}
-		}
-
-//		printf("%f %f %f %f ", row[0], row[1], row[2], row[3]);
-//		printf("\n");
-	}
-	for (auto row : data)
-	{
-		for (size_t i = 0; i < 5; i++)
-		{
-			row[i] = (row[i] - mins[i]) / (maxes[i] - mins[i]);
-		}
-
-//		printf("%f %f %f %f ", row[0], row[1], row[2], row[3]);
-//		printf("\n");
-	}
-	return data;
-}
-
-
-void Report(DataType Error)
-{
-	cout.precision(10);
-	cout << fixed;
-	cout << "Delta: " << Error << endl;
-
-	//printf("Error = %f \n", Error);
-}
 
 int main()
 {
 	const std::string filename("irisdata.txt");
-    std::vector<DataType> data;
-    std::vector<DataType> label;
+    std::vector<int> data;
+    std::vector<int> label;
 
     std::ifstream file(filename);
     std::string line;
@@ -158,13 +40,16 @@ int main()
         {
             try
             {
+        		int   ival;
+        		float fval = std::stof(value);
+        		memcpy(&ival, &fval, sizeof(int));
             	if (valueCount < 4)
             	{
-            		data.push_back(std::stof(value)); // Convert string to float and add to data
+            		data.push_back(ival);
             	}
             	else
             	{
-            		label.push_back(std::stof(value));// Convert string to float and add to label
+            		label.push_back(ival);
             	}
                 //printf("%f ", std::stof(value));
             }
@@ -186,119 +71,62 @@ int main()
     file.close();
 
 	// push 1 weight per feature
-    DataType Weights[4];
+    int WeightsIn[4];
+    float fWeightsIn[] = { 0.1, 0.1, 0.1, 0.1 };
+
+    CopyDataTypeToIntBuffers(fWeightsIn, WeightsIn, 4);
+
     for (int i = 0; i < 4; i++)
     {
-    	Weights[i] = (0.1 * (i + 1));
+    	printf("w%d = %f ", i, fWeightsIn[i]);
     }
 
-    DataType bias = 0.0;
-    DataType learningRate = 0.01;
 
-	auto start = std::chrono::high_resolution_clock::now();
-	DataType db, cost = 0;
-	DataType dw[4];
+    float fWeightsOut[] = { 0.0, 0.0, 0.0, 0 };
+    int  WeightsOut[4];
+
+    float fBias = 0.1;
+    int Bias;
+
+	memcpy(&Bias, &fBias, sizeof(int));
+	printf("\n Bias = %f \n", fBias);
+
+	float fCost = 0;
+	int Cost = 0;
+
     unsigned int DataDim = 4;
 	unsigned int TrainingSize = MAX_SAMPLES;
 
+    float fLearningRate = 0.01;
+    int LearningRate;
+	memcpy(&LearningRate, &fLearningRate, sizeof(int));
+
+	unsigned int NumEpochs = 1000;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
 
 	LogRegression(data.data(), label.data(),
-				  Weights, &bias,
+				  WeightsIn, WeightsOut, &Bias,
 				  &DataDim, &TrainingSize,
-				  dw, &db, &cost);
+				  &LearningRate, &NumEpochs,
+				  &Cost);
 
 	auto stop = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-start).count();
 	 std::cout << "RUNTIME : "
 			   << stop <<" ms " << std::endl;
 
-}
+	 printf("\n Updated WeightsOut : ");
+	 CopyIntToDataTypeBuffers(WeightsOut, fWeightsOut, 4);
 
-#if 0
-int  main()
-{
-	unsigned int DataDimension = MAX_DATA_SIZE;
-
-
-	DataType Input[MAX_DATA_SIZE];
-	int Label[MAX_DATA_SIZE];
-	DataType Weights[MAX_FULL_DIM];
-
-	vector<DataType *> Data = ReadData(string("irisdata.txt"));
-
-	std::cout << "Something is working here" << std::endl;
-
-	std::random_shuffle(Data.begin(), Data.end());
-
-
-	printf("\n");
-
-	//int epochs = 100000;
-	int epochs = 100000;
-
-	unsigned int TrainingSize = 100;
-	CoeffType LearningRate = 0.1;
-	CoeffType Momentum = 0.9;
-
-	//for (auto i = 0; i < epochs; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		std::vector<DataType> DataVec;
-		std::vector<DataType> LabelVec;
-		std::vector<DataType> Weights;
-		DataType Error = 0.0;
-
-		for (int count = 0; count < TrainingSize; count++)
-		{
-			DataType *row = Data.at(count);
-			//DataType Input[4] = {row[0], row[1], row[2], row[3]};
-			printf("row[0] = %f %f %f %f \n", row[0], row[1], row[2], row[3]);
-			DataVec.push_back(row[0]);
-			DataVec.push_back(row[1]);
-			DataVec.push_back(row[2]);
-			DataVec.push_back(row[3]);
-			LabelVec.push_back(row[4]);
-
-
-			//printf(" Row %d : %f %f %f %f \n ", count, row[0], row[1], row[2], row[3]);
-
-		}
-
-		// push 1 weight per feature
-	    for (int i = 0; i < 4; i++)
-	    {
-	    	Weights.push_back(0.1 * (i + 1));
-	    }
-
-	    DataType bias = 0.0;
-	    unsigned int DataDim = 4;
-
-		auto start = std::chrono::high_resolution_clock::now();
-		DataType db, dw, cost = 0;
-
-		LogRegression(DataVec.data(), LabelVec.data(),
-					  Weights.data(), &bias,
-					  &DataDim, &TrainingSize,
-					  &dw, &db, &cost);
-
-		auto stop = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-start).count();
-		 std::cout << "RUNTIME : "
-				   << stop <<" ms " << std::endl;
-
-		printf("dw = %f  db = %f  cost = %f", (float)dw, (float)db, (float)cost);
-		//if (i % 1000 == 0)
-		{
-			//printf("i = %d Error = %f\n", i, Error);
-			Report(Error);
-		}
+		printf("wo%d = %f ", i, fWeightsOut[i]);
 	}
 
-//	FullPrint(	Input, Output,
-//				DataDimension,  HiddenDimension,
-//				Weightss,
-//				Weights,
-//				Weights );
+	 memcpy(&fBias, &Bias, sizeof(int));
+	 printf("\n Updated Bias = %f \n", fBias);
 
-	printf("End .... \n");
-	return 0;
+	 memcpy(&fCost, &Cost, sizeof(int));
+	 printf("\n Updated Cost = %f \n", fCost);
 }
-#endif
-
