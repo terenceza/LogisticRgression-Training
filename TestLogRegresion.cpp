@@ -1,3 +1,8 @@
+/******************************************************************************
+* Sensecoding.com Integrated Solutions for Low-Powered Systems
+* Run on Vitis HLS
+******************************************************************************/
+
 #include "../src/LogRegression.hpp"
 #include <stdio.h>
 #include <string>
