@@ -1,6 +1,6 @@
 /******************************************************************************
 * Sensecoding.com Integrated Solutions for Low-Powered Systems
-* Run on Vitis 
+* Run on Vitis ARM FreeRTOS
 ******************************************************************************/
 
 #include <stdio.h>
