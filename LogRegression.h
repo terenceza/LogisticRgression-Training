@@ -1,3 +1,8 @@
+/******************************************************************************
+* Sensecoding.com Integrated Solutions for Low-Powered Systems
+* Run on Vitis ARM FreeRTOS
+******************************************************************************/
+
 #ifndef LOG_REG_TRAIN_H
 #define LOG_REG_TRAIN_H
 
