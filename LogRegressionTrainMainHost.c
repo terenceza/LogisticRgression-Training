@@ -11,7 +11,7 @@
 /* Xilinx includes. */
 #include "xil_printf.h"
 #include "xparameters.h"
-#include "LogRegression.h"
+#include "LogRegressionHost.h"
 
 #define TIMER_ID	1
 #define DELAY_10_SECONDS	10000UL
