@@ -17,8 +17,8 @@ using namespace std;
 int main()
 {
 	const std::string filename("irisdata.txt");
-    std::vector<int> data;
-    std::vector<int> label;
+    std::vector<unsigned int> data;
+    std::vector<unsigned int> label;
 
     std::ifstream file(filename);
     std::string line;
@@ -41,7 +41,7 @@ int main()
             try
             {
         		int   ival;
-        		float fval = std::stof(value);
+        		DataType fval = std::stof(value);
         		memcpy(&ival, &fval, sizeof(int));
             	if (valueCount < 4)
             	{
@@ -71,8 +71,8 @@ int main()
     file.close();
 
 	// push 1 weight per feature
-    int WeightsIn[4];
-    float fWeightsIn[] = { 0.1, 0.1, 0.1, 0.1 };
+    unsigned int WeightsIn[4];
+    DataType fWeightsIn[] = { 0.1, 0.1, 0.1, 0.1 };
 
     CopyDataTypeToIntBuffers(fWeightsIn, WeightsIn, 4);
 
@@ -82,46 +82,44 @@ int main()
     }
 
 
-    float fWeightsOut[] = { 0.0, 0.0, 0.0, 0 };
-    int  WeightsOut[4];
-
-    float fBias = 0.1;
-    int Bias;
+    DataType fBias = 0.1;
+    unsigned int Bias;
 
 	memcpy(&Bias, &fBias, sizeof(int));
 	printf("\n Bias = %f \n", fBias);
 
-	float fCost = 0;
-	int Cost = 0;
+	DataType fCost = 0;
+	unsigned int Cost = 0;
 
     unsigned int DataDim = 4;
 	unsigned int TrainingSize = MAX_SAMPLES;
 
-    float fLearningRate = 0.01;
-    int LearningRate;
+	DataType fLearningRate = 0.02;
+    unsigned int LearningRate;
 	memcpy(&LearningRate, &fLearningRate, sizeof(int));
 
-	unsigned int NumEpochs = 1000;
-
+	unsigned int NumEpochs = 500;
+	unsigned int ActualEpochs = 0;
 	auto start = std::chrono::high_resolution_clock::now();
 
-
-	LogRegression(data.data(), label.data(),
-				  WeightsIn, WeightsOut, &Bias,
-				  &DataDim, &TrainingSize,
-				  &LearningRate, &NumEpochs,
-				  &Cost);
+	for (int i = 0 ; i < 1 ; ++i)
+	{
+		LogRegression(data.data(), label.data(),
+					  WeightsIn, &Bias,
+					  &DataDim, &TrainingSize,
+					  &LearningRate, &NumEpochs,
+					  &Cost, &ActualEpochs);
+	}
 
 	auto stop = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-start).count();
 	 std::cout << "RUNTIME : "
 			   << stop <<" ms " << std::endl;
 
-	 printf("\n Updated WeightsOut : ");
-	 CopyIntToDataTypeBuffers(WeightsOut, fWeightsOut, 4);
+	 CopyIntToDataTypeBuffers(WeightsIn, fWeightsIn, 4);
 
 	for (int i = 0; i < 4; i++)
 	{
-		printf("wo%d = %f ", i, fWeightsOut[i]);
+		printf("wo%d = %f ", i, fWeightsIn[i]);
 	}
 
 	 memcpy(&fBias, &Bias, sizeof(int));
@@ -129,4 +127,6 @@ int main()
 
 	 memcpy(&fCost, &Cost, sizeof(int));
 	 printf("\n Updated Cost = %f \n", fCost);
+
+	 printf("Actual Epochs : %d", ActualEpochs);
 }
