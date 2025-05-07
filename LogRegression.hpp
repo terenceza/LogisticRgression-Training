@@ -7,6 +7,7 @@
 #define LOG_REGRESSION_TRAIN
 
 #include <ap_fixed.h>
+#include <iostream>
 
 #ifdef __SYNTHESIS__
 	#include <hls_math.h>
@@ -19,27 +20,27 @@
 #define MAX_SAMPLES 150
 
 #ifdef __SYNTHESIS__
-	typedef ap_fixed<25, 5, AP_RND_ZERO> DataType;
+	typedef ap_fixed<32, 16, AP_RND_ZERO> DataType;
 #else
 	typedef float DataType;
 #endif
 
-void LogRegression(int* DataInBuff, int* LabelsInBuff,
-				   int* WeightsInBuff, int* WeightsOutBuff, int* BiasP,
+void LogRegression(unsigned int* DataInBuff, unsigned int* LabelsInBuff,
+				   unsigned int* WeightsInBuff, unsigned int* BiasP,
 				   unsigned int* DataDimensionP, unsigned int* NumSamplesP,
-				   int* LearningRate, unsigned int* NumEpochs,
-				   int* CostP );
+				   unsigned int* LearningRateP, unsigned int* NumEpochsP,
+				   unsigned int* CostP, unsigned int* actualEpochsP );
 
 void Propagate( DataType* Inputs, DataType* Labels,
-				DataType *w, DataType* b,
-				unsigned int num_px, unsigned int num_samples,
+				DataType *Weights, DataType* Bias, DataType LeaningRate,
+				unsigned int NumFeatures, unsigned int NumSamples,
 				DataType* dw, DataType* db, DataType* cost);
 
 void CopyFloatToDataTypeBuffers(float* From, DataType* To, unsigned int Dim);
 void CopyDataTypeToFloatBuffers(DataType* From, float* To, unsigned int Dim);
 
-void CopyIntToDataTypeBuffers(int* From, DataType* To, unsigned int Dim);
-void CopyDataTypeToIntBuffers(DataType* From, int* To, unsigned int Dim);
+void CopyIntToDataTypeBuffers(unsigned int* From, DataType* To, unsigned int Dim);
+void CopyDataTypeToIntBuffers(DataType* From, unsigned int* To, unsigned int Dim);
 
 DataType sigmoid(DataType d);
 DataType squareError(DataType d1, DataType d2) ;
