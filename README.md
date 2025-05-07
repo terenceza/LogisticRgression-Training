@@ -6,5 +6,6 @@ DDR memory used to pass data through AXI and axi_lite;
 1) sets inputs required by to the top function : number of samples, number of features,
 input data, input weights and bias , learning rate and number of epochs;
 2) kicks the IP Kernel
-3) waits on interrupt from IP Kernel
+3) waits on interrupt from IP Kernel when training is completed completed
 4) reads back cost, actual epochs needed to achieve training and updated weights and bias to be used as inputs in inference
+
