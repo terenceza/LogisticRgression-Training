@@ -1,15 +1,7 @@
-/*
-    Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
-    Copyright (c) 2012 - 2022 Xilinx, Inc. All Rights Reserved.
-	SPDX-License-Identifier: MIT
-
-
-    http://www.FreeRTOS.org
-    http://aws.amazon.com/freertos
-
-
-    1 tab == 4 spaces!
-*/
+/******************************************************************************
+* Sensecoding.com Integrated Solutions for Low-Powered Systems
+* Run on Vitis ARM FreeRTOS
+******************************************************************************/
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
