@@ -179,6 +179,7 @@ void Propagate( DataType* Inputs, DataType* Labels,
 
         DataType cost1, cost2;
 		#ifdef __SYNTHESIS__
+        // log : desastreous for performance
         cost1 =       Labels[i] *  static_cast<DataType>(hls::log(    (Prob[i]).to_float()));
         cost2 =  (1 - Labels[i]) * static_cast<DataType>(hls::log(1 - (Prob[i]).to_float()));
 		#else
