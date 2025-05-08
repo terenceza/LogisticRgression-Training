@@ -11,4 +11,5 @@ input data, input weights and bias , learning rate and number of epochs;
 
 Note: 
 - the logarithmic function used to compute the cost is bottleneck. Next step is to integrate the Floating Point IP provided by Vivado
-- optimization needed to be done with quantization to reduce memory consumption ( more efficient ap_fixed )
+- optimization needed to be done with quantization to reduce memory consumption ( more efficient ap_fixed ). Quantization will help reducing the number of
+  bits needed to represent the weights, increasing performance, saving memory and power consumption, without affecting the outcome of the learning process 
