@@ -9,3 +9,6 @@ input data, input weights and bias , learning rate and number of epochs;
 3) waits on interrupt from IP Kernel when training is completed completed
 4) reads back cost, actual epochs needed to achieve training and updated weights and bias to be used as inputs in inference
 
+Note: 
+- the logarithmic function used to compute the cost is bottleneck. Next step is to connect to the Floating Point IP provided by Vivado
+- optimization needed to be done with quantization to reduce memory consumption ( more efficient ap_fixed )
